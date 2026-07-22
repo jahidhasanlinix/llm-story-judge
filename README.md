@@ -7,7 +7,7 @@ System design diagram: [SYSTEM_DIAGRAM.md](SYSTEM_DIAGRAM.md)
 
 ## Demo
 
-<video src="demo/demo.mp4" controls width="720"></video>
+[▶ Click here to watch the demo video](demo/demo.mp4)
 
 ## Layout
 
