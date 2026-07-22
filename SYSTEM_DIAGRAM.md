@@ -1,6 +1,6 @@
 # System block diagram
 
-Bedtime story agent: user → storyteller → **hybrid judge** (code + LLM) → retry or deliver → optional user revision.
+Bedtime story agent: user → **request safety gate** → storyteller → **hybrid story judge** (code + LLM) → retry or deliver → optional user revision.
 
 ```text
 ┌────────────┐
@@ -11,7 +11,7 @@ Bedtime story agent: user → storyteller → **hybrid judge** (code + LLM) → 
       │ 1. bedtime request (or change notes)
       ▼
 ┌──────────────────────────────────────────────────────────────┐
-│                    Orchestrator (main)                        │
+│                    Orchestrator (src/story_agent)              │
 │         generate_with_judge_loop  +  user feedback loop       │
 └─────────────┬────────────────────────────────▲───────────────┘
               │ 2. generate / revise           │ 6. story + scores
@@ -31,7 +31,7 @@ Bedtime story agent: user → storyteller → **hybrid judge** (code + LLM) → 
 │  ┌──────────────┐  ┌─────────────────┐  │    │
 │  │ Code gate    │  │ LLM gate        │  │    │
 │  │ word_count   │  │ safety / arc /  │  │    │
-│  │ 300–800      │  │ fidelity /      │  │    │
+│  │ 100–250      │  │ lesson / fidel. │  │    │
 │  │              │  │ engage 1–5      │  │    │
 │  │ (measurable) │  │ temp=0.0        │  │    │
 │  └──────┬───────┘  └────────┬────────┘  │    │
@@ -57,11 +57,14 @@ Bedtime story agent: user → storyteller → **hybrid judge** (code + LLM) → 
                             keep / request changes
 ```
 
+Before step 2, an **LLM request gate** blocks unsafe asks (blood, death, terror) with a clear `FAIL` so the storyteller cannot quietly rewrite them into a PASS.
+
 ## Prompt / interaction flow
 
 | Step | From → To | What moves |
 |------|-----------|------------|
 | 1 | User → Orchestrator | Free-text bedtime request |
+| 1b | Request gate → User | If unsafe: `FAIL` + reason; stop (no story) |
 | 2 | Orchestrator → Storyteller | Request + optional judge/user feedback |
 | 3 | Storyteller → Hybrid Judge | Full draft (title + story) |
 | 4a | Code → Orchestrator | Deterministic word count / length gate |
