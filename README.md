@@ -1,4 +1,4 @@
-# llm-story-judge
+# LLM StoryJudge for kids
 
 Bedtime story agent for ages 5–10. A storyteller writes the story.
 
